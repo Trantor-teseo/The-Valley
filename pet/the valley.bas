@@ -535,14 +535,14 @@
 45000 df=5:dl$="w":gosub 36000: rem ** delay + wipe
 45010 rt=int(0.067*(ex+ts/3)^0.5+log(ex/((tn+1)^1.5))):if rt>28 then rt=28
 45020 if rt<0 then rt=0
-45030 print d$:"your rating now be";rt
+45030 print d$;"your rating now be";rt
 45040 if t(2)=1 then print "you have the helm of evanna"
 45050 if t(0)=1 then print "amulet stones...{space}";t(1)
 45060 df=250:dl$="w":gosub36000: rem ** delay + wipe
 45070 if gc$="e" then c=c-10: gc$="":goto 2010: rem ** movement
 45080 return
 47999 rem ** quit valley routine
-48000 print d$:"thou art safe in a castle":if cs<20 then cs=20
+48000 print d$;"thou art safe in a castle":if cs<20 then cs=20
 48010 poke m,pk:pk=peek(w):m=w:poke m,q
 48020 print "wilt thou leave the valley (y/n) ?"
 48030 vg$="yn":gosub 1500: rem ** uniget
