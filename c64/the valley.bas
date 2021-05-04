@@ -1,0 +1,615 @@
+1 REM * the valley ********************
+2 REM * (c) ct magazine - 1982        *
+3 REM *                               *
+4 REM * porting by:                   *
+5 REM * Trantor/Hokuto Force 2021     *
+6 REM *********************************
+18 REM ********************************
+19 REM ** define major variables
+20 PRINT"{clear}{light green}":D$="{home}{down*21}"
+30 R$="{right*30}"
+40 POKE53265,91:POKE53280,12:POKE53281,5:POKE53282,7:POKE53283,7:POKE53284,0
+50 POKE788,(PEEK(788)+3)
+100 DIMD(3),G(76),N(8),P(8),S(4),T(2)
+110 DIMM$(18),MS(18),N1(18)
+120 DEFFNC(W)=W-1023+55295
+130 TM=2:POKE53280,12:POKE53281,8
+150 D1$=LEFT$(D$,17)
+160 SP$="{space*39}"
+180 R1$=LEFT$(R$,21)
+190 CM$="{right}7 9{space*3}8{down}{left*6}V{space*3}4{sh +}6{down}{left*8}1 3{space*3}2"
+195 CC$="{up*3}"+R$+"{space*7}{down}{left*6}{space*7}{down}{left*8}{space*7}"
+300 FORI=1TO32
+310 READC$
+320 NEXTI
+330 FORI=0TO18
+340 READM$(I):READMS(I):READN1(I)
+350 NEXTI
+997 REM *******************************
+998 REM ** character choice and load
+999 POKE53265,27
+1000 PRINTCHR$(142)CHR$(8)"{clear}":POKE53265,27
+1005 PRINT"{down*4}{light green}load a character from tape ({reverse on}y{reverse off}/{reverse on}n{reverse off}) ?"
+1010 VG$="yn":GOSUB1500: REM ** uniget
+1020 INPUT"{home}{down*7}character's name";J$
+1030 IFJ$=""THEN1020
+1040 IFLEN(J$)>16THENPRINT"{down}{white}too long{light green}";"{home}{down*7}";SP$;SP$:GOTO1020
+1050 IFGC$="n"THEN1240
+1060 PRINT"{clear}place data tape in the tape deck"
+1070 PRINT"{down}{red}is it rewound ?"
+1080 GOSUB1600: REM ** anykey
+1090 OPEN1,1,0,J$
+1100 INPUT#1,P$
+1110 INPUT#1,TS
+1120 INPUT#1,EX
+1130 INPUT#1,TN
+1140 INPUT#1,CS
+1150 INPUT#1,PS
+1160 INPUT#1,T(0)
+1170 INPUT#1,T(1)
+1180 INPUT#1,T(2)
+1190 INPUT#1,C1
+1200 INPUT#1,P1
+1210 CLOSE1
+1220 C=150
+1230 GOTO1400
+1240 PRINT"{clear}{down*4}{pink}character types{light green}...choose carefully"
+1250 PRINT
+1260 PRINT"{yellow}wizard{space*5}(1)"
+1270 PRINT"{yellow}thinker{space*4}(2)"
+1280 PRINT"{yellow}barbarian{space*2}(3)","{pink}key 1-5{yellow}"
+1290 PRINT"{yellow}warrior{space*4}(4)"
+1300 PRINT"{yellow}cleric{space*5}(5){light green}"
+1310 GETGC$:IFGC$=""THEN1310
+1320 A=VAL(GC$)
+1330 IFA=1THENP$="wizard":P1=2:C1=0.5:CS=22:PS=28
+1340 IFA=2THENP$="thinker":P1=1.5:C1=0.75:CS=24:PS=26
+1350 IFA=3THENP$="barbarian":P1=0.5:C1=2:CS=28:PS=22
+1360 IFA=4THENP$="warrior":P1=1:C1=1.25:CS=26:PS=24
+1370 IFA=5THENP$="cleric":P1=1.25:C1=1:CS=25:PS=25
+1380 IFA<1ORA>5THENP$="dolt":P1=1:C1=1:CS=20:PS=20
+1390 EX=5:C=150
+1400 PRINT"{down*4}{light green}good luck,";
+1410 PRINT"{pink}";J$;" the ";P$"!{dark gray}"
+1420 DF=150:DL$="d":GOSUB36000:REM ** delay
+1430 GOSUB10000
+1440 DF=5:GOSUB36000:REM ** delay + update
+1450 GOTO2000
+1498 REM ******************************
+1499 REM ** uniget routine
+1500 GETGC$:IFGC$=""THEN1500
+1510 FORI=1TOLEN(VG$)
+1520 IFMID$(VG$,I,1)=GC$THENRETURN
+1530 NEXTI
+1540 GOTO1500
+1598 REM *****************************
+1599 REM ** anykey routine
+1600 PRINT"{down}** press any key to continue **"
+1610 GETGC$:IFGC$=""THEN1610
+1620 RETURN
+1698 REM ******************************
+1699 REM ** combat get routine
+1700 GETGC$:IFGC$<>""THEN1700:REM ** empties buffer
+1710 TV=0
+1720 FORI=1TO60
+1730 GETGC$:IFGC$=""THEN1750
+1740 GOTO1770
+1750 NEXTI
+1760 TV=1:REM ** no key pressed
+1770 PRINTD$;SP$:REM ** wipe away message
+1780 RETURN
+1998 REM ******************************
+1999 REM ** movement routine
+2000 M=W:PK=PEEK(W):CK=PEEK(FNC(W)):POKEM,81:POKEFNC(M),2
+2010 C=C+10
+2020 IFPK=77ORPK=78THEN2040
+2030 PRINTD$;"your move...which direction ?";:GOTO2050
+2040 PRINTD$;"safe on the path..which way ?";
+2050 PRINTCM$:FORI=1TO10:GETGC$:NEXTI
+2060 GETGC$:IFGC$="e"THENPRINTCC$:GOTO45000
+2070 A=VAL(GC$):IFA=0THEN2060
+2075 PRINTCC$
+2080 IFA>3THENA=A-3:GOTO2080
+2090 W=M+A-2-40*(INT((VAL(GC$)-1)/3)-1)
+2100 TN=TN+1:PRINTD$;SP$
+2110 Q=81:Q1=PEEK(W):IFQ1=32ORQ1=45THEN2190
+2120 IFQ1=219THEN48000
+2130 IFQ1=214ORQ1=160ORQ1=88THENTN=TN-1:GOTO2030
+2135 IFQ1=214ORQ1=160ORQ1=88THENTN=TN-1:GOTO2030
+2140 IFQ1=216ORQ1=87ORQ1=173ORQ1=230THEN9000
+2150 IFQ1=104ORQ1=96THEN9090
+2160 IFQ1=102THEN15000
+2170 IFQ1=224OR(GC$="5"ANDPK=224)THENQ=209:C=C-20:IFC<=0THEN55000
+2180 IFQ1=42THEN2800
+2190 POKEM,PK:POKEFNC(M),CK:PK=PEEK(W):CK=PEEK(FNC(W)):M=W:POKEM,Q:POKEFNC(M),2
+2200 IFPK=77ORPK=78THENDF=5:GOTO2250
+2210 RF=RND(TI)
+2220 IFRF<0.33 THEN3000
+2230 IFRF>0.75 THEN2300
+2240 PRINTD$;"nothing of value...search on...":DF=80
+2250 GOSUB36000
+2260 GOTO2010
+2298 REM ******************************
+2299 REM ** finds routine
+2300 RF=INT(RND(TI)*6+1)
+2310 ONRFGOSUB2340,2380,2380,2410,2410,2440
+2320 DF=80:GOSUB36000
+2330 GOTO2010
+2340 PRINTD$;"a circle of evil...depart in haste !"
+2350 CS=CS+INT((FL+1)/2):PS=PS-INT((FL+1)/2):C=C-20
+2360 IFC<=0THEN55000
+2370 RETURN
+2380 PRINTD$;"a hoard of gold!"
+2390 TS=TS+INT(FL*RND(TI)*100+100)
+2400 RETURN
+2410 PRINTD$;"you feel the aura of the deep magic..."
+2420 PRINT"{space*8}...all around you..."
+2430 GOTO2450
+2440 PRINTD$;"...a place of ancient power..."
+2450 PS=PS+2+INT(FL*P1):CS=CS+1+INT(FL*C1):C=C+25
+2460 RETURN
+2798 REM ******************************
+2799 REM ** special finds routine
+2800 POKEM,32:M=W:PK=32:POKEM,81
+2810 RN=RND(TI):PRINTD$;SP$
+2820 IFS=6ANDRN>0.95ANDT(1)>1ANDT(2)=0ANDRT>7THENT(2)=1:GOTO2870
+2830 IFS=5ANDRN>0.8ANDT(0)=0THENT(0)=1:GOTO2880
+2840 IFS=4ANDRN>0.7ANDT(0)=1ANDT(1)<6ANDFL>T(1)THEN2890
+2850 IFRN>0.43THENPRINTD$;"a worthless bauble.":GOTO2940
+2860 PRINTD$;"a precious stone !":GOTO2930
+2870 PRINTD$;"you find the helm of evanna!":GOTO2930
+2880 PRINTD$;"the amulet of alarian...empty...":GOTO2930
+2890 PRINTD$;"an amulet stone..."
+2900 DF=60:DL$="d":GOSUB36000
+2910 IFRN>0.85THENPRINT"{down}...but the wrong one !":GOTO2940
+2920 PRINT"{down}...the stone fits !":T(1)=T(1)+1
+2930 TS=TS+100*(T(0)+T(1)+T(2)+FL)
+2940 DF=80:GOSUB36000
+2950 GOTO2010
+2998 REM ******************************
+2999 REM ** monster selection routine
+3000 PRINTD$;WM$;" ** beware...thou hast encountered **"
+3010 MS=0:N=0:CF=1
+3020 RF=INT(RND(TI)*17):IFRF>9ANDRND(TI)>0.85THEN3020
+3030 IFQ1=224ORPK=224THENRF=INT(RND(TI)*2+17)
+3040 IFRF=16ANDRND(TI)<0.7THEN3020
+3050 IFFL<5ANDRF=15THEN3020
+3060 X$=LEFT$(M$(RF),1)
+3070 FORI=1TOLEN(F$)
+3080 IFMID$(F$,I,1)=X$THEN3110
+3090 NEXTI
+3100 GOTO3020
+3110 M$=RIGHT$(M$(RF),LEN(M$(RF))-1)
+3120 IFMS(RF)=0THEN3150
+3130 MS=INT((CS*0.3)+MS(RF)*FL^0.2/(RND(TI)+1))
+3140 IFN1(RF)=0THEN3160
+3150 N=INT(N1(RF)*FL^0.2/(RND(TI)+1))
+3160 U=INT((RF+1)*(FL^1.5))
+3170 IFRF>23THENU=INT((RF-22)*FL^1.5)
+3180 PRINT"{down}";LEFT$(R$,12-(LEN(M$))/2);"an evil ";M$;CO$
+3190 DF=40:GOSUB36000
+3498 REM ******************************
+3499 REM ** character's combat routine
+3500 IFRND(TI)<0.5THEN4000
+3510 PRINTD$;"you have surprise..";WM$;"a";CO$;"ttack or ";WM$;"r";CO$;"etreat?"
+3520 GOSUB1700
+3530 IFGC$="r"THEN3900
+3540 IFTV=1THEN3600
+3550 IFGC$<>"a"THEN4000
+3560 DF=30:DL$="d":GOSUB36000
+3570 PRINTD$;WM$;"*** strike quickly ***"CO$
+3580 GOSUB1700
+3590 IFTV=0THEN3620
+3600 PRINTD$;"* too slow...too slow *"
+3610 HF=0:GOTO3830
+3620 E=39*LOG(EX)/3.14
+3630 IFGC$="s"THEN4500
+3640 IFMS=0THENPRINTD$;WM$;"your sword avails you nought here!"CO$:GOTO3830
+3650 C=C-1
+3660 IFC<=0THENPRINTD$;WM$;"you fatally exhaust yourself!":GOTO55000
+3670 RF=RND(TI)*10
+3680 IFGC$="h"AND(RF<5ORCS>MS*4)THENZ=2:GOTO3730
+3690 IFGC$="b"AND(RF<7ORCS>MS*4)THENZ=1:GOTO3730
+3700 IFGC$="l"AND(RF<9ORCS>MS*4)THENZ=0.3:GOTO3730
+3710 PRINTD$;"you missed it !"
+3720 HF=0:GOTO3830
+3730 IFHF=1THEND=MS+INT(RND(TI)*9):HF=0:GOTO3760
+3740 D=INT((((CS*50*RND(TI))-(10*MS)+E)/100)*Z):IFD<0THEND=0
+3750 IFCS>(MS-D)*4THENHF=1
+3760 MS=MS-D
+3770 PRINTD$;"a hit..."
+3780 DF=60:DL$="d":GOSUB36000
+3790 IFD=0THENPRINTD$;"{right*8}";"but...no damage!":HF=0:GOTO3830
+3800 PRINTD$;"{right*8}";D;" damage...":IFMS<=0THEN3860
+3810 IFHF=1THENDF=30:DL$="d":GOSUB36000
+3820 IFHF=1THENPRINT"{down}the ";M$;" staggers,defeated..."
+3830 DF=110:GOSUB36000
+3840 IFHF=1THEN3570
+3850 GOTO4000
+3860 PRINTD$;"{down*2}...killing the monster..."
+3870 EX=EX+U:HF=0:CF=0
+3880 DF=80:GOSUB36000
+3890 GOTO2010
+3900 PRINTD$;WM$;"knavish coward!"CO$:CF=0
+3910 GOTO3880
+3998 REM ******************************
+3999 REM ** monster's combat routine
+4000 PRINTD$;"the creature attacks..."
+4010 DF=50:DL$="w":GOSUB36000
+4020 IFMS=0THEN4300
+4030 IFMS<NANDN>6ANDRND(TI)<0.5THEN4300
+4040 MS=MS-1:IFMS<=0THEN4240
+4050 RF=INT(RND(TI)*10+1)
+4060 ONRFGOTO4070,4080,4090,4100,4110,4110,4120,4120,4130,4140
+4070 PRINTD$;"it swings at you...and misses":GOTO4280
+4080 PRINTD$;"your blade deflects the blow":GOTO4280
+4090 PRINTD$;"...but hesitates, unsure...":GOTO4280
+4100 Z=3:PRINTD$;WM$;"it strikes your head!!":GOTO4150
+4110 Z=1.5:PRINTD$;WM$;"your chest is struck!":GOTO4150
+4120 Z=1:PRINTD$;WM$;"a strike to your swordarm!":GOTO4150
+4130 Z=1.3:PRINTD$;WM$;"a blow to your body!":GOTO4150
+4140 Z=0.5:PRINTD$;WM$;"it catches your legs!"
+4150 PRINTCO$:DF=60:DL$="d":GOSUB36000
+4160 G=INT((((MS*75*RND(TI))-(10*CS)-E)/100)*Z)
+4170 IFG<0THENG=0:PRINTD$;"...saved by your armour!{space*3}":GOTO4280
+4180 C=C-G
+4190 IFG>9THENCS=INT(CS-G/6)
+4200 IFG=0THENPRINTD$;"shaken......but no damage done.":GOTO4280
+4210 PRINTD$;"you take...{space*6}{left*6}";G;" damage...{space*6}"
+4220 IFCS<=0ORC<=0THEN55000
+4230 GOTO4280
+4240 PRINTD$;"..using its last energy in the attempt!"
+4250 EX=INT(EX+U/2):CF=0
+4260 DF=100:GOSUB36000
+4270 GOTO2010
+4280 DF=100:GOSUB36000
+4290 GOTO3570
+4300 PRINTD$;"...hurling a lightning bolt at you!"
+4310 G=INT(((180*N*RND(TI))-(PS+E))/100):N=N-5:IFG>9THENN=N-INT(G/5)
+4320 DF=80:DL$="w":GOSUB36000
+4330 IFN<=0THENN=0:GOTO4240
+4340 IFRND(TI)<0.25THEN4410
+4350 IFG<=0THENG=0:GOTO4400
+4360 PRINTD$;WM$;"it strikes home!"CO$
+4370 DF=110:GOSUB36000
+4380 C=C-G:IFG>9THENPS=INT(PS-G/4)
+4390 GOTO4210
+4400 PRINTD$;"your psi shield protects you!":GOTO4280
+4410 PRINTD$;"...missed you!":GOTO4280
+4498 REM ******************************
+4499 REM ** spell control routine
+4500 PRINTD$;"which spell seek ye ? ":GOSUB1700:REM ** combat get
+4510 IFTV=1THEN3600:REM ** too slow
+4520 IFVAL(GC$)>0ANDVAL(GC$)<=3THEN4540
+4530 PRINTD$;"no such spell...{space*5}":GOTO4640
+4540 IF4*PS*RND(TI)<=NTHEN4590
+4550 ONVAL(GC$)GOSUB5000,5200,5400
+4559 REM ** sc contains outcome flag
+4560 ONSCGOTO4620,4640,4660,4570,4600,4580,4590
+4570 PRINTD$;"it is beyond you{space*5}":GOTO4640
+4580 PRINT"but the spell fails...!":GOTO4640
+4590 PRINTD$;"no use:the beast's psi shields it!":GOTO4640
+4600 PRINTD$;WM$;"the spell saps all your strength....."
+4610 GOTO55000:REM ** death
+4620 DF=100:GOSUB36000
+4630 GOTO2010:REM ** movement
+4640 DF=60:GOSUB36000
+4650 GOTO4000:REM ** monster's combat
+4660 DF=60:GOSUB36000
+4670 GOTO3570:REM ** character's combat
+4998 REM ******************************
+4999 REM ** spell 1 (sleepit)
+5000 C=C-5:IFC<=0THENSC=5:RETURN
+5010 PRINTD$;"sleep you foul fiend that i may escape"
+5020 PRINT"and preserve my miserable skin"
+5030 DF=180:GOSUB36000
+5040 PRINTD$;"the creature staggers..."
+5050 DF=40:DL$="d":GOSUB36000
+5060 IFRND(TI)<0.5THEN5090
+5070 PRINT"and collapses...stunned!"
+5080 EX=INT(EX+U/2):CF=0:SC=1:RETURN
+5090 PRINTWM$;"but recovers with a snarl!"
+5100 SC=2:RETURN
+5198 REM ******************************
+5199 REM ** spell 2 (psi-lance)
+5200 IFMS>CORPS<49OREX<1000THENSC=4:RETURN
+5210 C=C-10:IFC<=0THENSC=5:RETURN
+5220 IFN=0THENPRINTD$;"this beast has no psi to attack":SC=2:RETURN
+5230 PRINTD$;"with my mind i battle thee for my life!"
+5240 DF=120:GOSUB36000
+5250 RF=RND(TI):IFRF<0.4ANDN>10THENSC=6:RETURN
+5260 D=INT((((CS*50*RND(TI))-5*(MS+N)+E)/50)/4)
+5270 IFD<=0THEND=0:SC=7:RETURN
+5280 PRINTD$;"the psi-lance causes";D*4;" damage"
+5290 N=N-3*D:IFN<=0THENN=0
+5300 MS=MS-D:IFMS<=0THENMS=0
+5310 IF(MS+N)>0THENSC=2:RETURN
+5320 PRINT"{down}...killing the creature!"
+5330 EX=EX+U:CF=0:SC=1:RETURN
+5398 REM ******************************
+5399 REM ** spell 3 (crispit)
+5400 IFPS<77OREX<5000THENSC=4:RETURN
+5410 C=C-20:IFC<=0THENSC=5:RETURN
+5420 PRINTD$;"with the might of my sword i smite thee"
+5430 PRINT"with the power of my spell i curse thee"
+5440 PRINT"burn ye spawn of hell and suffer..."
+5450 DF=240:GOSUB36000
+5460 PRINTD$;"a bolt of energy lashes at the beast..."
+5470 DF=80:DL$="w":GOSUB36000
+5480 IFRND(TI)>(PS/780)*(5-P1)THENPRINTD$;"missed it!":SC=2:RETURN
+5490 D=INT((CS+PS*RND(TI))-(10*N*RND(TI)))
+5500 IFD<=0THEND=0:SC=7:RETURN
+5510 IFMS=0THENN=N-D:GOTO5530
+5520 MS=MS-D:IFD>10THENN=INT(N-(D/3))
+5530 PRINTD$;"it strikes home causing";D;" damage !!"
+5540 IF(MS+N)<=0THEN5570
+5550 DF=80:DL$="d":GOSUB36000
+5560 SC=2:RETURN
+5570 PRINT"{down}the beast dies screaming!"
+5580 EX=EX+U:CF=0:SC=1:RETURN
+8998 REM ******************************
+8999 REM ** scenario control routine
+9000 IFQ1=230ANDPK=224THENPRINTD$;"you cannot enter this way...":GOTO9110
+9010 FORI=2TO7
+9020 P(I)=0
+9030 N(I)=INT(RND(TI)*5+4)
+9040 IFN(I)=5THEN9030
+9050 NEXTI
+9060 IFS=1THENMP=M
+9070 P(2)=INT(RND(TI)*30+1)
+9080 TF=TN:GOTO9130
+9090 IFTN>TF+INT(RND(TI)*6+1)THEN9130
+9100 PRINTD$;"the way is barred."
+9110 TN=TN-1:C=C-10:DF=100:DL$="w":GOSUB36000
+9120 GOTO2010
+9130 C=C-10:POKEM,32:POKEW,Q:POKEFNC(W),2
+9140 IFQ1=96THENS=1:FL=1
+9150 IFQ1=104ANDS=4THENS=1:FL=1
+9160 IFQ1=104ANDS=5ORS=6THENS=S-3:FL=FL-4:M=MW
+9170 IFQ1=173THENS=2:FL=2
+9180 IFQ1=216THENS=3:FL=3
+9190 IFQ1=216ORQ1=173THEND2$=LEFT$(D$,INT(RND(TI)*10)):R2$=LEFT$(R$,P(2))
+9200 IFQ1=87THENS=4:FL=2
+9210 IFQ1=230THENS=S+3:FL=FL+4:MW=M
+9220 ONSGOSUB10000,12000,12010,14000,14010,14010
+9230 DF=5:GOSUB36000
+9240 GOTO2000
+9998 REM ******************************
+9999 REM ** scenario 1 (the valley)
+10000 PRINT"{clear}":F$="vaegh":FL=1:S=1:POKE53280,12:POKE53281,3:CO$="{dark gray}":WM$="{red}"
+10010 PRINT"{home}{blue}{reverse on}{V*40}";
+10030 FORI=1TO12:PRINT"V"SPC(38)"V";:NEXTI
+10050 PRINT"{V*40}{dark gray}"
+10060 IFG(0)<>0THEN10190
+10070 M=1065+(INT(RND(TI)*11+1)*40)
+10080 L=M:MP=M:W=M:G(0)=M:G(1)=219
+10090 FORI=2TO74STEP2
+10100 IFRND(TI)>0.5THEN10120
+10110 PC=77:L1=L+41:GOTO10130
+10120 PC=78:L1=L-39
+10130 IFL1>=1542ORL1<=1062THEN10100
+10140 G(I+1)=PC
+10150 IFI>2ANDG(I+1)<>G(I-1)THENL1=L+1
+10160 G(I)=L1:L=L1
+10170 NEXTI
+10180 G(75)=219
+10190 FORI=0TO74STEP2
+10200 POKEG(I),G(I+1):POKEFNC(G(I)),12
+10210 NEXTI:POKEFNC(G(0)),0:POKEFNC(G(74)),0
+10220 IFS(0)<>0THEN10280
+10230 FORI=0TO4
+10240 N1=INT(RND(TI)*11)+1:N2=INT(RND(TI)*34)+1
+10250 S(I)=1065+(40*N1)+N2
+10260 IFPEEK(S(I))<>32ORPEEK(S(I)+1)<>32THEN10240
+10270 NEXTI
+10280 POKES(0),216:POKES(0)+1,216:POKES(1),216:POKES(1)+1,216
+10285 FORI=0TO1:POKEFNC(S(I)),5:POKEFNC(S(I)+1),5::NEXTI
+10290 POKES(2),173:POKES(2)+1,173:POKES(3),173:POKES(3)+1,173
+10295 FORI=2TO3:POKEFNC(S(I)),14:POKEFNC(S(I)+1),14::NEXTI
+10300 POKES(4),87:POKEFNC(S(4)),0
+10310 M=MP:W=M
+10320 RETURN
+11998 REM ******************************
+11999 REM ** scenario 2 (woods and swamps)
+12000 F$="afl":PC=45:CL=6:POKE53281,14:WM$="{white}":CO$="{dark gray}":GOTO12020
+12010 F$="faehl":PC=88:CL=11:POKE53281,5:WM$="{white}":CO$="{dark gray}"
+12020 PK=32:CK=13
+12030 PRINT"{clear}"
+12040 L=1066
+12050 FORI=1TO200
+12060 R=INT(RND(TI)*515):POKEL+R,PC:POKEFNC(L)+R,CL
+12070 NEXTI
+12080 PRINT"{home}{blue}";D2$;R2$"{right*2}{reverse on}{sh space*2}"
+12090 PRINTR2$;"{right}{reverse on}{sh space*5}"
+12100 PRINTR2$;"{reverse on}{sh space*2}{reverse off}{space*2}{reverse on}{sh space*3}"
+12110 PRINTR2$;"{reverse on}{sh space*2}{black}{cm +}{blue}{reverse off} {reverse on}{sh space*3}"
+12120 PRINTR2$;"{right}{reverse on}{sh space*4}{right}{sh space*2}"
+12130 PRINTR2$;"{right*3}{reverse on}{sh space*2}"
+12140 PRINTR2$;"{right*4}{reverse on}{sh space}"
+12150 PRINT"{home}{sh space*40}";
+12160 FORI=1TO13
+12170 PRINT"{sh space}"SPC(38)"{sh space}";
+12180 NEXTI
+12190 PRINT"{sh space*40}"
+12200 POKE1562,32:W=1562
+12210 IFQ1=104THENM=MW:W=M
+12220 RETURN
+13998 REM ******************************
+13999 REM ** scenario 3 (castle-types)
+14000 F$="cage":P=0:H=N(FL):PK=32:CW=3:POKE53281,0:WM$="{pink}":CO$="{yellow}":GOTO14020
+14010 F$="cbe":P=0:H=N(FL):PK=32:P(FL)=P(2):CW=11:CO$="{dark gray}":POKE53281,4
+14015 WM$="{white}":IFS=6THENPOKE53281,10
+14020 POKE646,CW:PRINT"{clear}{reverse on}{right*2}{space*21}{reverse off}"
+14030 FORI=1TO13
+14040 PRINT"{reverse on}{right*2} {reverse off}{space*19}{reverse on} {reverse off}"
+14050 NEXTI
+14060 PRINT"{reverse on}{right*2}{space*21}{reverse off}"
+14070 RESTORE:FORI=1TOP(FL)
+14080 READV:IFV=100THENRESTORE
+14090 NEXTI
+14100 L1=1066
+14110 FORJ=1TO3
+14120 READD(J):P=P+1
+14130 IFD(J)=100THENRESTORE:D(J)=3:P=P+1
+14140 NEXTJ
+14150 FORI=0TOH:PC=160
+14160 L=L1+(40*I):IFL>1546THEN14260
+14170 IFI=1THENPC=32
+14180 IFD(1)=0THENPC=160:GOTO14200
+14190 POKEL+D(1),PC:PC=160
+14195 POKEFNC(L)+D(1),CW
+14200 IFI=3THENPC=32
+14210 POKEL+D(1)+D(2),PC:PC=160
+14215 POKEFNC(L)+D(1)+D(2),CW
+14220 IFI=4THENPC=32
+14230 POKEL+D(1)+D(2)+D(3),PC:PC=160
+14240 NEXTI
+14250 L1=L1+(40*H)+40:GOTO14110
+14260 L1=1066
+14270 FORJ=1TO4
+14280 L=L1+(40*J*(H+1))
+14290 FORK=1TO19
+14300 IFL>1506THEN14350
+14310 POKEL+K,PC:POKEFNC(L)+K,CW
+14320 IFK=2ORK=3*HORK=17THENPOKEL+K,32:POKEL+K-40,32:POKEL+K+40,32
+14330 NEXTK
+14340 NEXTJ
+14350 IFS=5ORS=6THEN14380
+14360 IFFL/2=INT(FL/2)THENPOKE1547,102:POKEFNC(1547),CW:GOTO14380
+14370 POKE1085,102:POKEFNC(1085),CW
+14380 IFFL=2ORS=5ORS=6THENPOKE1592,104:POKE1552,32:POKEFNC(1592),CW
+14390 IFP(3)=0THENW=1552
+14400 IFS=5THEN14470
+14410 IFS=6THEN14450
+14420 PRINT"{home}";R1$;"{down*4}{right*3}{pink}the black tower"
+14430 PRINTR1$;"{right*3}{space*3}of zaexon"
+14440 PRINTR1$;"{down*3}{right*3}{pink}{space*3}floor ";FL-1:GOTO14490
+14450 PRINT"{home}";R1$;"{down*2}{red}{right*5} vounim's "
+14460 PRINTR1$;"{right*5}{space*3}lair{space*3}":GOTO14500
+14470 PRINT"{home}";R1$;"{down*2}{red}{right*4}the temple of"
+14480 PRINTR1$;"{right*4}{space*2}y'nagioth{space*2}"
+14490 P(FL+1)=P(FL)+P
+14500 IFS<>5ANDS<>6ANDFL<4THENRETURN
+14510 FORI=1TOINT(RND(TI)*5)+2
+14520 N1=INT(RND(TI)*19)
+14530 N2=INT(RND(TI)*12)
+14540 IFPEEK(1067+40*N2+N1)<>32THEN14520
+14550 POKE1067+40*N2+N1,42:POKE55339+40*N2+N1,1
+14560 NEXTI
+14570 RETURN
+14998 REM ******************************
+14999 REM ** stairs routine
+15000 POKEW,81:POKEM,32:POKEFNC(W),2
+15010 PRINTD$;"a stairway...{reverse on}u{reverse off}p or {reverse on}d{reverse off}own ?":TV=FL
+15020 VG$="ud":GOSUB1500
+15030 IFGC$="u"THENFL=FL+1:GOTO15050
+15040 FL=FL-1
+15050 IFFL>7OR FL<2THEN15080
+15060 DF=110:DL$="d":GOSUB36000
+15070 GOTO9220
+15080 PRINTD$;"these stairs are blocked "
+15090 DF=60:DL$="d":GOSUB36000
+15100 FL=TV:GOTO15010
+35998 REM ******************************
+35999 REM ** delay, wipe & update routine
+36000 FORDL=1TO(DF*TM*2)
+36010 NEXTDL
+36020 IFDL$="d"THENDL$="":RETURN
+36030 PRINTD$;SP$
+36040 PRINTSP$
+36050 PRINTSP$
+36060 IFDL$="w"THENDL$="":RETURN
+36070 IFCS>77-INT(2*P1^2.5)THENCS=77-INT(2*P1^2.5)
+36080 IFPS<7THENPS=7
+36090 IFPS>INT(42*(P1+1)^LOG(P1^3.7))+75THENPS=INT(42*(P1+1)^LOG(P1^3.7))+75
+36100 IFC>125-(INT(P1)*12.5)THENC=125-INT(INT(P1)*12.5)
+36110 PRINTWM$;D1$;"{up}";J$,P$;CO$
+36120 PRINT"treasure{space*3}=";TS
+36130 PRINT"experience =";EX
+36140 PRINT"turns{space*6}=";TN
+36150 PRINTD1$;R1$;"combat str ={space*4}{left*4}";CS
+36160 PRINTR1$;"psi power{space*2}={space*4}{left*4}";PS
+36170 PRINTR1$;"stamina{space*4}={space*4}{left*4}";C
+36180 IFCF=1THEN36210
+36190 PRINTSP$
+36200 RETURN
+36210 PRINTD$;WM$;"{up*2}";M$;CO$;
+36220 PRINTD$;R1$;"{up*2}m str ={space*12}{left*12}";MS;N;"{space*4}"
+36230 RETURN
+44998 REM ******************************
+44999 REM ** rating routine
+45000 DF=5:DL$="w":GOSUB36000
+45010 RT=INT(0.067*(EX+TS/3)^0.5+LOG(EX/((TN+1)^1.5))):IFRT>28THENRT=28
+45020 IFRT<0THENRT=0
+45030 PRINTCO$;D$;"your rating now be";RT
+45040 IFT(2)=1THENPRINT"you have the helm of evanna"
+45050 IFT(0)=1THENPRINT"amulet stones... ";T(1)
+45060 DF=250:DL$="w":GOSUB36000
+45070 IFGC$="e"THENC=C-10:GC$="":GOTO2010
+45080 RETURN
+47998 REM ******************************
+47999 REM ** quit valley routine
+48000 PRINTD$;"thou art safe in a castle":IFCS<20THENCS=20
+48010 POKEM,PK:PK=PEEK(W):M=W:POKEM,Q
+48020 PRINT"wilt thou leave the valley ?(y/n)"
+48030 VG$="yn":GOSUB1500
+48040 DF=5:DL$="w":GOSUB36000
+48050 GOSUB45000
+48060 DF=110:DL$="w":GOSUB36000
+48070 IFGC$="y"THEN50000
+48080 C=150:PRINTD$;"thy wounds healed...thy sword sharp"
+48090 PRINT"go as the gods demand..trust none other"
+48100 DF=120:GOSUB36000
+48110 GOTO2010
+49998 REM ******************************
+49999 REM ** save character routine
+50000 PRINT"{clear}do you wish to save ";J$;" ?"
+50010 PRINT:PRINT"please key y or n"
+50020 VG$="yn":GOSUB1500
+50030 IFGC$="n"THEN50210
+50040 PRINT"{clear}place your cassette in the tape deck"
+50050 PRINT"is it rewound ?"
+50060 GOSUB1600
+50070 OPEN1,1,1,J$
+50080 PRINT#1,P$
+50090 PRINT#1,TS
+50100 PRINT#1,EX
+50110 PRINT#1,TN
+50120 PRINT#1,CS
+50130 PRINT#1,PS
+50140 PRINT#1,T(0)
+50150 PRINT#1,T(1)
+50160 PRINT#1,T(2)
+50170 PRINT#1,C1
+50180 PRINT#1,P1
+50190 CLOSE1
+50200 PRINT"{clear}{down*3}"," *** {reverse on}done{reverse off} ***"
+50210 PRINTCO$"{down*4}dost thou wish to re-enter the valley?"
+50220 VG$="yn":GOSUB1500:IFI=1THENRUN
+50230 PRINT"{clear}":END
+54998 REM ******************************
+54999 REM ** death routine
+55000 C=0:CS=0:CF=0
+55010 DF=110:GOSUB36000
+55020 IFT(1)>0THEN55070
+55030 PRINTD$,WM$;"{left}oh,what a frail shell"
+55040 PRINT,"{left*3}is this that we call man!"
+55050 DF=300:DL$="w":GOSUB36000
+55060 PRINT"{clear}":GOTO50210
+55070 T(0)=0:T(1)=0:TS=0:CS=30:C=150:PS=30
+55080 PRINTD$;WM$;"{space*3}alarian's amulet protects thy soul"
+55090 PRINT"{down}{space*13}{reverse on}{space*2}live again{space*2}{reverse off}"
+55100 DF=150:GOSUB36000
+55110 L=G(0):MP=L:M=W:S=1:GOTO9220
+59998 REM ******************************
+59999 REM ** data for castle type scenarios
+60000 DATA4,7,3,6,4,4,6,5,3,6,0,3,8,4,3,5,5,3,8,3,4,5,0,6,3,6,4,6,4,7,4,100
+60008 REM ******************************
+60009 REM ** data for monsters
+60010 DATAAWOLFEN,9,0,AHOB-GOBLIN,9,0,AORC,9,0,EFIRE-IMP,7,3,GROCK-TROLL,19,0
+60020 DATAEHARPY,10,12,AOGRE,23,0,BBARROW-WIGHT,0,25,HCENTAUR,18,14
+60030 DATAEFIRE-GIANT,26,20,VTHUNDER-LIZARD,50,0,CMINOTAUR,35,25,CWRAITH,0,30
+60040 DATAFWYVERN,36,12,BDRAGON,50,20,CRING-WRAITH,0,45,ABALROG,50,50
+60048 REM ******************************
+60049 REM ** special monsters for water only
+60050 DATALWATER-IMP,15,15,LKRAKEN,50,0
