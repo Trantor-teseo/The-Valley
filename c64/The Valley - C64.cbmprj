@@ -9,9 +9,9 @@
     <FilesGlobal>False</FilesGlobal>
     <BatchMode>False</BatchMode>
     <AppendToDisk>False</AppendToDisk>
-    <GenToDisk>False</GenToDisk>
-    <BuildToPrgFile>True</BuildToPrgFile>
-    <d64Name />
+    <GenToDisk>True</GenToDisk>
+    <BuildToPrgFile>False</BuildToPrgFile>
+    <d64Name>the valley.d64</d64Name>
     <Comments />
     <Author />
     <AutoLaunchName>the valley.prg</AutoLaunchName>
@@ -36,22 +36,20 @@
         <PreBuildCommands />
         <PostBuildCommands />
     </BuildEvents>
-    <BuildList>
-        <FileName>the valley.bas</FileName>
-    </BuildList>
+    <BuildList />
     <DetermineBuildOrder>0</DetermineBuildOrder>
     <PaddingByte>0</PaddingByte>
     <AssyBinaryFileLocation />
     <SourceFiles>
         <SourceFile>
             <Name>the valley.bas</Name>
-            <PrgName />
+            <PrgName>the valley.prg</PrgName>
             <FileType>1</FileType>
             <IncludeInBuild>True</IncludeInBuild>
             <Regions />
             <Breakpoints />
             <Bookmarks />
-            <Topmost>False</Topmost>
+            <Topmost>True</Topmost>
             <FileOpen>True</FileOpen>
         </SourceFile>
     </SourceFiles>

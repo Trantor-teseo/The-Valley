@@ -6,10 +6,10 @@
 6 REM *********************************
 18 REM ********************************
 19 REM ** define major variables
-20 PRINT"{clear}{light green}":D$="{home}{down*21}"
-30 R$="{right*30}"
 40 POKE53265,91:POKE53280,12:POKE53281,5:POKE53282,7:POKE53283,7:POKE53284,0
 50 POKE788,(PEEK(788)+3)
+60 PRINT"{clear}{light green}":D$="{home}{down*21}"
+70 R$="{right*30}"
 100 DIMD(3),G(76),N(8),P(8),S(4),T(2)
 110 DIMM$(18),MS(18),N1(18)
 120 DEFFNC(W)=W-1023+55295
@@ -29,28 +29,28 @@
 998 REM ** character choice and load
 999 POKE53265,27
 1000 PRINTCHR$(142)CHR$(8)"{clear}":POKE53265,27
-1005 PRINT"{down*4}{light green}load a character from tape ({reverse on}y{reverse off}/{reverse on}n{reverse off}) ?"
+1005 PRINT"{down*4}{light green}load a character from disk ({reverse on}y{reverse off}/{reverse on}n{reverse off}) ?"
 1010 VG$="yn":GOSUB1500: REM ** uniget
 1020 INPUT"{home}{down*7}character's name";J$
 1030 IFJ$=""THEN1020
 1040 IFLEN(J$)>16THENPRINT"{down}{white}too long{light green}";"{home}{down*7}";SP$;SP$:GOTO1020
 1050 IFGC$="n"THEN1240
-1060 PRINT"{clear}place data tape in the tape deck"
-1070 PRINT"{down}{red}is it rewound ?"
+1060 PRINT"{clear}place data disk in the drive"
+1070 PRINT"{down}{red}is the lid closed ?"
 1080 GOSUB1600: REM ** anykey
-1090 OPEN1,1,0,J$
-1100 INPUT#1,P$
-1110 INPUT#1,TS
-1120 INPUT#1,EX
-1130 INPUT#1,TN
-1140 INPUT#1,CS
-1150 INPUT#1,PS
-1160 INPUT#1,T(0)
-1170 INPUT#1,T(1)
-1180 INPUT#1,T(2)
-1190 INPUT#1,C1
-1200 INPUT#1,P1
-1210 CLOSE1
+1090 OPEN8,8,8,""+J$+",r,s"
+1100 INPUT#8,P$
+1110 INPUT#8,TS
+1120 INPUT#8,EX
+1130 INPUT#8,TN
+1140 INPUT#8,CS
+1150 INPUT#8,PS
+1160 INPUT#8,T(0)
+1170 INPUT#8,T(1)
+1180 INPUT#8,T(2)
+1190 INPUT#8,C1
+1200 INPUT#8,P1
+1210 CLOSE8
 1220 C=150
 1230 GOTO1400
 1240 PRINT"{clear}{down*4}{pink}character types{light green}...choose carefully"
@@ -567,26 +567,26 @@
 50010 PRINT:PRINT"please key y or n"
 50020 VG$="yn":GOSUB1500
 50030 IFGC$="n"THEN50210
-50040 PRINT"{clear}place your cassette in the tape deck"
-50050 PRINT"is it rewound ?"
+50040 PRINT"{clear}place data disk in the drive"
+50050 PRINT"is the lid closed ?"
 50060 GOSUB1600
-50070 OPEN1,1,1,J$
-50080 PRINT#1,P$
-50090 PRINT#1,TS
-50100 PRINT#1,EX
-50110 PRINT#1,TN
-50120 PRINT#1,CS
-50130 PRINT#1,PS
-50140 PRINT#1,T(0)
-50150 PRINT#1,T(1)
-50160 PRINT#1,T(2)
-50170 PRINT#1,C1
-50180 PRINT#1,P1
-50190 CLOSE1
+50070 OPEN8,8,8,"@0:"+J$+",w,s"
+50080 PRINT#8,P$
+50090 PRINT#8,TS
+50100 PRINT#8,EX
+50110 PRINT#8,TN
+50120 PRINT#8,CS
+50130 PRINT#8,PS
+50140 PRINT#8,T(0)
+50150 PRINT#8,T(1)
+50160 PRINT#8,T(2)
+50170 PRINT#8,C1
+50180 PRINT#8,P1
+50190 CLOSE8
 50200 PRINT"{clear}{down*3}"," *** {reverse on}done{reverse off} ***"
 50210 PRINTCO$"{down*4}dost thou wish to re-enter the valley?"
-50220 VG$="yn":GOSUB1500:IFI=1THENRUN
-50230 PRINT"{clear}":END
+50220 VG$="yn":GOSUB1500:IFI=1THENCLR:RUN60
+50230 PRINT"{clear}":CLR:END
 54998 REM ******************************
 54999 REM ** death routine
 55000 C=0:CS=0:CF=0
