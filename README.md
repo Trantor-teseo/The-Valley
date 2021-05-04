@@ -16,3 +16,5 @@ After that the game will start and you can move freely inside the map by using t
       / | \
     7   8   9
 
+Combat is performed using the `H`, `B` and `L` keys to attempt to strike, respectively, the *head*, *body* or *legs* of your opponent. You can also press `S` to cast a magic spell: hit keys `1-3` to choose the spell (*Sleep*, *Psi Lance* and *Crispit*). *Sleep* is available to you from the start; the others as you gain experience. Some monsters are ethereal and **can only be fought with magic**.
+
