@@ -26,28 +26,28 @@
 340 read m$(i):read ms(i): read n1(i)
 350 next i
 999 rem ** character choice and load
-1000 print "{clear}{down}load a character from tape (y/n) ?"
+1000 print "{clear}{down}load a character from disk (y/n) ?"
 1010 vg$="yn":gosub1500:rem ** uniget
 1020 input "{down}character's name {right*2}*{left*3}";j$
 1030 if j$="*" then 1020
 1040 if len(j$)>16 then print "{down}too long":goto 1020
 1050 if gc$="n" then 1240
-1060 print"{clear}place data tape in the tape deck"
-1070 print"{down}is it rewound ?"
+1060 print"{clear}place data disk in the drive"
+1070 print"{down}is the lid closed ?"
 1080 gosub1600:rem ** anykey
-1090 open 1,1,0,j$
-1100 input#1,p$
-1110 input#1,ts
-1120 input#1,ex
-1130 input#1,tn
-1140 input#1,cs
-1150 input#1,ps
-1160 input#1,t(0)
-1170 input#1,t(1)
-1180 input#1,t(2)
-1190 input#1,c1
-1200 input#1,p1
-1210 close 1
+1090 open 8,8,8,""+j$+",r,s"
+1100 input#8,p$
+1110 input#8,ts
+1120 input#8,ex
+1130 input#8,tn
+1140 input#8,cs
+1150 input#8,ps
+1160 input#8,t(0)
+1170 input#8,t(1)
+1180 input#8,t(2)
+1190 input#8,c1
+1200 input#8,p1
+1210 close 8
 1220 c=150
 1230 goto 1400
 1240 print "{clear}{down*2}character types... chose carefully"
@@ -559,22 +559,22 @@
 50010 print:print"please key y or n"
 50020 vg$="yn":gosub1500:rem ** uniget
 50030 if gc$="n" then 50210
-50040 print "{clear}place your cassette in the tape deck"
-50050 print "is it rewound ?"
+50040 print "{clear}place data disk in the drive"
+50050 print "is the lid closed ?"
 50060 gosub 1600: rem ** anykey
-50070 open 1,1,1,j$
-50080 print#1,p$
-50090 print#1,ts
-50100 print#1,ex
-50110 print#1,tn
-50120 print#1,cs
-50130 print#1,ps
-50140 print#1,t(0)
-50150 print#1,t(1)
-50160 print#1,t(2)
-50170 print#1,c1
-50180 print#1,p1
-50190 close 1
+50070 open 8,8,8,"@0:"+j$+",w,s"
+50080 print#8,p$
+50090 print#8,ts
+50100 print#8,ex
+50110 print#8,tn
+50120 print#8,cs
+50130 print#8,ps
+50140 print#8,t(0)
+50150 print#8,t(1)
+50160 print#8,t(2)
+50170 print#8,c1
+50180 print#8,p1
+50190 close 8
 50200 print"{clear}{down*3}"," *** done ***"
 50210 print d$;"{space*6}type run to start again"
 50220 clr
