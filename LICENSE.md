@@ -1,5 +1,5 @@
 
-Copyright (c) 2021, Alessandro Sperinde'
+Copyright (c) 2021, Trantor / Hokuto Force
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
